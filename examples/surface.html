@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><title>Surface · glass-controls</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../dist/glass-controls.css">
+<link rel="stylesheet" href="demo.css">
+<script type="importmap">{ "imports": { "liquid-glass-js": "../node_modules/liquid-glass-js/dist/liquid-glass.esm.js" } }</script>
+<script type="module">
+  import { init } from '../dist/glass-controls.js'
+  // Demo knobs: ?chroma=0.25 splits colour at live rims; ?refraction=0 turns the live rim off.
+  const q = new URLSearchParams(location.search), root = document.documentElement.style
+  if (q.has('chroma')) root.setProperty('--gc-chroma', q.get('chroma'))
+  if (q.has('refraction')) root.setProperty('--gc-refraction', q.get('refraction'))
+  window.glass = init()
+</script>
+</head><body>
+<main class="scene" data-glass-scene style="place-items: end center; padding-bottom: 12vh; box-sizing: border-box"><img class="bg" src="photos/vertical-lines.jpg" style="object-position: 50% 80%" alt="">
+<div class="stage">
+  <div data-glass="surface" class="pane" id="card" style="--gc-blur: 1.5px; --gc-tint-amount: 42%; --gc-bezel: 30; --gc-refraction: 60; min-height: 150px">
+    <h2>Now playing</h2><p>A plain surface: the rim bends the lines under it.</p>
+  </div>
+</div>
+<p class="credit">Photo: <a href="https://unsplash.com/photos/ensfVEUbiJc">Alexander Psiuk</a> on Unsplash</p><a class="back" href="./">All examples</a></main></body></html>
