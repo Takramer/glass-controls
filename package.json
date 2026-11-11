@@ -7,19 +7,50 @@
   "module": "dist/glass-controls.js",
   "types": "dist/glass-controls.d.ts",
   "exports": {
-    ".": { "types": "./dist/glass-controls.d.ts", "import": "./dist/glass-controls.js" },
+    ".": {
+      "types": "./dist/glass-controls.d.ts",
+      "import": "./dist/glass-controls.js"
+    },
     "./glass-controls.css": "./dist/glass-controls.css"
   },
-  "files": ["dist", "src", "README.md", "LICENSE"],
-  "sideEffects": ["*.css"],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "build": "esbuild src/index.js --bundle --format=esm --external:liquid-glass-js --outfile=dist/glass-controls.js && esbuild src/index.js --bundle --minify --format=esm --external:liquid-glass-js --outfile=dist/glass-controls.min.js && cp src/glass-controls.css src/glass-controls.d.ts dist/",
     "check": "node src/refract.js",
     "serve": "python3 -m http.server 8811"
   },
-  "dependencies": { "liquid-glass-js": "0.1.0" },
-  "devDependencies": { "esbuild": "^0.25.0" },
-  "keywords": ["glass", "refraction", "backdrop-filter", "svg-filter", "spring", "ui-controls", "slider", "segmented-control"],
+  "dependencies": {
+    "liquid-glass-js": "0.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "keywords": [
+    "glass",
+    "refraction",
+    "backdrop-filter",
+    "svg-filter",
+    "spring",
+    "ui-controls",
+    "slider",
+    "segmented-control"
+  ],
   "license": "MIT",
-  "author": "Thomas Kramer"
+  "author": "Thomas Kramer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takramer/glass-controls.git"
+  },
+  "homepage": "https://github.com/Takramer/glass-controls#readme",
+  "bugs": {
+    "url": "https://github.com/Takramer/glass-controls/issues"
+  }
 }
