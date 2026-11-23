@@ -9,10 +9,8 @@ The optics are not new. Every surface and lens runs on the WebGL2 engine from [l
 ## Install and use
 
 ```sh
-npm install github:Takramer/glass-controls
+npm install glass-controls
 ```
-
-The npm registry still holds 0.1.0, the older build. This README describes 0.2.0.
 
 ```html
 <link rel="stylesheet" href="node_modules/glass-controls/dist/glass-controls.css">
