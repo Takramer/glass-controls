@@ -3,34 +3,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="../dist/glass-controls.css">
 <link rel="stylesheet" href="demo.css">
-<script type="importmap">{ "imports": { "liquid-glass-js": "../node_modules/liquid-glass-js/dist/liquid-glass.esm.js" } }</script>
 <script type="module">
   import { init } from '../dist/glass-controls.js'
-  // Demo knobs: ?chroma=0.25 splits colour at live rims; ?refraction=0 turns the live rim off.
-  const q = new URLSearchParams(location.search), root = document.documentElement.style
-  if (q.has('chroma')) root.setProperty('--gc-chroma', q.get('chroma'))
-  if (q.has('refraction')) root.setProperty('--gc-refraction', q.get('refraction'))
   window.glass = init()
 </script>
 </head><body>
-<main class="scene" data-glass-scene><img class="bg" src="photos/neon-street.jpg" alt="">
+<main class="scene"><img class="bg" src="photos/neon-street.jpg" alt="">
 <style>
-  .bar { position: absolute; top: 20px; left: 50%; translate: -50%; display: flex; align-items: center; gap: 4px; padding: 4px; }
-  .bar .more { min-height: 36px; padding: 0 14px 0 16px; border: 0; border-radius: 999px; background: none; font: 500 15px/20px system-ui; color: inherit; cursor: pointer; }
-  .bar .more:focus-visible { outline: none; box-shadow: var(--gc-focus); }
-  .sheet { --gc-radius: 24px; --gc-tint-amount: 62%; position: absolute; top: 72px; left: 50%; translate: 60px 0; width: 200px; padding: 6px; transform-origin: 70% 0; transition: opacity 160ms, scale 240ms cubic-bezier(.32,.72,0,1); }
+  .nav-wrap { position: absolute; z-index: 1; top: 20px; left: 50%; translate: -50%; width: max-content; max-width: calc(100vw - 24px); }
+  .bar { display: flex; align-items: center; padding: 4px; }
+  .bar .more { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; font: 500 15px/20px system-ui; color: inherit; cursor: pointer; }
+  .bar .more:focus-visible { outline: none; box-shadow: var(--gc-focus-in); }
+  @media (hover: hover) { .bar .more:hover { background: color-mix(in srgb, currentColor 12%, transparent); } }
+  .bar .more:active { background: color-mix(in srgb, currentColor 20%, transparent); }
+  .sheet { --gc-radius: 24px; position: absolute; top: calc(100% + 8px); right: 0; width: 200px; padding: 6px; transform-origin: 100% 0; transition: opacity 160ms, scale 240ms cubic-bezier(.32,.72,0,1); }
   .sheet[hidden] { display: block; opacity: 0; scale: .9; pointer-events: none; visibility: hidden; }
 </style>
+<div class="nav-wrap">
 <nav data-glass="surface" class="bar" aria-label="Main" id="bar">
   <ul data-glass="segmented">
     <li><a href="#home" aria-current="page">Home</a></li><li><a href="#work">Work</a></li><li><a href="#about">About</a></li>
   </ul>
   <button class="more" aria-expanded="false" aria-controls="sheet" id="more">More</button>
 </nav>
-<div data-glass="surface" class="sheet" id="sheet" hidden>
+<div data-glass="surface" data-glass-menu class="sheet" id="sheet" hidden>
   <ul data-glass="segmented" aria-orientation="vertical">
     <li><a href="#journal">Journal</a></li><li><a href="#talks">Talks</a></li><li><a href="#contact">Contact</a></li>
   </ul>
+</div>
 </div>
 <script>
   // Demo page code: the links mark aria-current; the More button opens the sheet.

@@ -1,32 +1,31 @@
 /* glass-controls: the material, rim light, shadow and control styles.
-   Works without the script: every [data-glass] element keeps the frosted material and native behaviour.
-   The script adds .gc once a control is wired, the refracting rim where the browser can run one
-   (html.gc-live, Chromium), the springs, and the lenses. Tune everything with the custom properties. */
+   Works without the script: every [data-glass] element keeps the glass material and native behaviour.
+   The script adds .gc once a control is wired, the WebGL2 glass where the browser can run it
+   (html.gc-live), the springs, and the lenses. Tune everything with the custom properties. */
 
 :root {
   --gc-tint: #fff;           /* the glass colour */
-  --gc-tint-amount: 52%;     /* how much of it; the rest is the blurred backdrop */
-  --gc-blur: 14px;
+  --gc-tint-amount: 32%;     /* how much of it: a control is nearly clear, as Apple's are */
+  --gc-blur: 1px;
+  --gc-menu-tint-amount: 66%; /* a menu holds rows of text, so it is frosted */
+  --gc-menu-blur: 16px;
+  --gc-halo: rgb(255 255 255 / 0.98); /* hugs a label's letters; on a dark scene use a dark one and a white --gc-ink */
   --gc-saturate: 1.8;
   --gc-ink: #111;            /* text on glass */
   --gc-accent: #0a64d8;      /* a selected button */
   --gc-accent-ink: #fff;
   --gc-radius: 999px;
-  --gc-pill: #fff;           /* a segmented control's selection at rest */
+  --gc-pill: #fff;           /* a selection, thumb or knob at rest */
+  --gc-pill-ink: #111;       /* a label on that pill */
   --gc-track: rgb(0 0 0 / 0.16);
   --gc-track-fill: var(--gc-ink);
-  /* Read by the script (unitless): the rim's width, the most a ray moves, the colour split. */
-  --gc-bezel: 14;
-  --gc-refraction: 22;
-  --gc-chroma: 0;
   /* Light from the top left, a thinner return at the bottom right, a hairline all round. */
   --gc-rim: inset 0 0 0 0.5px rgb(255 255 255 / 0.55), inset 1px 1px 0.5px -0.5px rgb(255 255 255 / 0.95), inset -1px -1px 0.5px -0.5px rgb(255 255 255 / 0.55);
   --gc-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.08), 0 8px 24px rgb(0 0 0 / 0.16);
   /* Two tones, so the ring reads over any photo. */
   --gc-focus: 0 0 0 2px #fff, 0 0 0 4.5px #111;
+  --gc-focus-in: inset 0 0 0 2px #111, inset 0 0 0 4px #fff; /* inside a row, so it never crosses a neighbour */
 }
-/* With a refracting rim the glass can be clearer: the rim, not the blur, says what it is. */
-html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
 
 /* ---- The material ------------------------------------------------------------------------------------ */
 [data-glass="surface"], [data-glass="button"] {
@@ -35,9 +34,27 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
   border-radius: var(--gc-radius);
   background-color: color-mix(in srgb, var(--gc-tint) var(--gc-tint-amount), transparent);
   -webkit-backdrop-filter: blur(var(--gc-blur)) saturate(var(--gc-saturate));
-  backdrop-filter: blur(var(--gc-blur)) var(--gc-lens,) saturate(var(--gc-saturate));
+  backdrop-filter: blur(var(--gc-blur)) saturate(var(--gc-saturate));
   box-shadow: var(--gc-rim), var(--gc-shadow);
 }
+/* Apple's second material: on a surface that holds rows, add data-glass-menu. */
+[data-glass="surface"][data-glass-menu] { --gc-tint-amount: var(--gc-menu-tint-amount); --gc-blur: var(--gc-menu-blur); --gc-halo: transparent; }
+/* Browsers reset text-shadow on a button, so buttons inside glass are named here. */
+:where([data-glass="surface"], [data-glass="button"], [data-glass="segmented"], [data-glass="switch"], [data-glass-light], :where([data-glass="surface"], [data-glass="segmented"]) button:not([data-glass])) {
+  text-shadow: 0 0 1px var(--gc-halo), 0 0 1px var(--gc-halo), 0 0 2px var(--gc-halo), 0 0 3px var(--gc-halo), 0 0 8px var(--gc-halo);
+}
+
+/* ---- The engine's canvas ------------------------------------------------------------------------------
+   Once it has drawn a frame the host drops its CSS material. Without WebGL2 that never happens. */
+:where([data-glass-host]) { position: relative; isolation: isolate; }
+[data-glass-host][data-glass-ready] { background: transparent !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+/* A host that clips or scrolls cannot show a shadow from its canvas, so it keeps the CSS one. */
+[data-glass-host][data-glass-clip][data-glass-ready] { box-shadow: var(--gc-shadow) !important; }
+.gc-canvas { position: absolute; z-index: -1; max-width: none; width: 0; height: 0; pointer-events: none; }
+.gc-stick { position: sticky; display: block; }
+.gc-knob > .gc-canvas { z-index: auto; }
+.gc-knob[data-live] > .gc-pill { opacity: 0; }
+@media print { .gc-canvas { display: none; } }
 
 /* ---- Buttons ----------------------------------------------------------------------------------------- */
 [data-glass="button"] {
@@ -45,28 +62,29 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: 44px; min-width: 44px; padding: 0 20px;
   font: 500 15px/20px system-ui, -apple-system, "Segoe UI", sans-serif;
-  cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+  cursor: pointer; touch-action: pan-y pinch-zoom; -webkit-tap-highlight-color: transparent;
   transition: background-color 160ms ease, color 160ms ease;
 }
-@media (hover: hover) { [data-glass="button"]:hover { --gc-tint-amount: 72%; } }
+@media (hover: hover) { [data-glass="button"]:hover { --gc-tint-amount: 48%; } }
 [data-glass="button"][aria-pressed="true"] {
-  --gc-tint: var(--gc-accent); --gc-tint-amount: 88%; color: var(--gc-accent-ink);
+  --gc-tint: var(--gc-accent); --gc-tint-amount: 88%; --gc-halo: transparent; color: var(--gc-accent-ink); text-shadow: none;
 }
 [data-glass="button"]:focus-visible { outline: none; box-shadow: var(--gc-rim), var(--gc-shadow), var(--gc-focus); }
+[data-glass="button"][data-glass-ready]:focus-visible { box-shadow: var(--gc-focus) !important; }
 /* The light under the finger, brightest at the peak of the press (--gc-p runs 0 to 1). */
 [data-glass="button"].gc::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; /* under the label */
   background: radial-gradient(circle at var(--gc-lx, 50%) var(--gc-ly, 30%), rgb(255 255 255 / calc(var(--gc-p, 0) * 0.6)), transparent 70%);
 }
+[data-glass="button"][data-glass-ready]::after { display: none; } /* the engine lights the rim itself */
 [data-glass="button"]:not(.gc):active { scale: 0.97; }
 
-/* ---- Lens mounts (slider thumb, segmented selection) -------------------------------------------------
-   A lens holds a copy of the page under it, inside the control. Rules that style a control's items
-   use child combinators, so they never reach into that copy. */
-.gc-seg, .gc-range { position: relative; isolation: isolate; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
-.gc > .gc-knob { position: absolute; inset: 0; z-index: 2; display: block; margin: 0; padding: 0; pointer-events: none; }
+/* ---- Lens mounts (slider thumb, segmented selection, switch knob) ------------------------------------ */
+.gc-seg, .gc-range { position: relative; isolation: isolate; touch-action: pan-y pinch-zoom; -webkit-tap-highlight-color: transparent; }
+.gc-seg[aria-orientation="vertical"] { touch-action: pinch-zoom; }
+:is(.gc, .gc-sw) > .gc-knob { position: absolute; inset: 0; z-index: 2; display: block; margin: 0; padding: 0; pointer-events: none; }
 .gc-knob > .gc-in { position: absolute; }
-.gc-knob > .lqg-glass { pointer-events: none; }
+.gc-pill { background: var(--gc-pill); box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.16); }
 
 /* ---- Segmented control -------------------------------------------------------------------------------- */
 [data-glass="segmented"] { display: flex; gap: 0; margin: 0; padding: 0; list-style: none; }
@@ -75,26 +93,21 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: center; gap: 6px;
   min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px;
-  font: 500 15px/20px system-ui, -apple-system, "Segoe UI", sans-serif; color: inherit; text-decoration: none; white-space: nowrap;
+  font: 500 15px/20px system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--gc-ink); text-decoration: none; white-space: nowrap;
   background: none; cursor: pointer;
 }
-:is([aria-orientation="vertical"] > *, [aria-orientation="vertical"] > li > *):is(button, a[href]) { justify-content: flex-start; min-height: 44px; border-radius: 16px; }
-:is([data-glass="segmented"] > *, [data-glass="segmented"] > li > *):is(button, a[href]):focus-visible { outline: none; box-shadow: var(--gc-focus); }
+:is([aria-orientation="vertical"] > *, [aria-orientation="vertical"] > li > *):is(button, a[href]) { justify-content: flex-start; min-height: 44px; border-radius: 18px; }
+:is([data-glass="segmented"] > *, [data-glass="segmented"] > li > *):is(button, a[href]):focus-visible { outline: none; box-shadow: var(--gc-focus-in); }
+:is([data-glass="segmented"] > *, [data-glass="segmented"] > li > *):is([aria-pressed="true"], [aria-current]:not([aria-current="false"])):focus-visible { box-shadow: inset 0 0 0 2px var(--gc-pill-ink); }
+@media (hover: hover) { :is(.gc-seg:not(:active) > *, .gc-seg:not(:active) > li > *):is(button, a[href]):not([aria-pressed="true"], [aria-current]:not([aria-current="false"])):hover { background: color-mix(in srgb, currentColor 12%, transparent); } }
 /* Without the script the chosen item is a plain pill. */
 [data-glass="segmented"]:not(.gc) :is([aria-pressed="true"], [aria-current]:not([aria-current="false"])) { background: var(--gc-pill); }
-/* With it, the knob is the pill: the labels sit on it at rest; while it moves it is clear glass over
-   them, showing their magnified copy. */
-:is(.gc-seg > *, .gc-seg > li > *):is(button, a[href]) { z-index: 3; }
-:is(.gc-seg.gc-moving > *, .gc-seg.gc-moving > li > *):is(button, a[href]) { z-index: 1; }
-.gc-seg > .gc-knob { transition: opacity 160ms ease; }
+/* With it, the knob is the pill: the labels sit on it at rest; while it moves the lens draws them itself. */
+:is(.gc-seg > *, .gc-seg > li > *):is(button, a[href]) { z-index: 1; }
+:is(.gc-seg > *, .gc-seg > li > *):is([aria-pressed="true"], [aria-current]:not([aria-current="false"])) { color: var(--gc-pill-ink); text-shadow: none; }
+.gc-seg > .gc-knob { z-index: 0; transition: opacity 160ms ease; }
+.gc-seg > .gc-knob[data-live] { z-index: 2; }
 .gc-seg.gc-none > .gc-knob { opacity: 0; }
-.gc-seg .lqg-lens { opacity: var(--gc-p, 0); }
-.gc-seg .lqg-glass {
-  background: color-mix(in srgb, var(--gc-pill) calc((1 - var(--gc-p, 0)) * 82%), transparent);
-  box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / calc(var(--gc-p, 0) * 0.1)), inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 1px 2px rgb(0 0 0 / calc(0.12 - var(--gc-p, 0) * 0.04)), 0 calc(2px + var(--gc-p, 0) * 6px) calc(8px + var(--gc-p, 0) * 16px) rgb(0 0 0 / calc(0.08 + var(--gc-p, 0) * 0.08));
-}
 
 /* ---- Slider -------------------------------------------------------------------------------------------- */
 [data-glass="slider"] { display: flex; align-items: center; min-height: 44px; }
@@ -104,28 +117,54 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
 .gc-range .gc-track i { position: absolute; inset: 0 auto 0 0; width: var(--gc-fill-w, 0); border-radius: 3px; background: var(--gc-track-fill); }
 /* The real range stays in the page, unseen, for keys and screen readers. */
 .gc-range input[type="range"] { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; appearance: none; -webkit-appearance: none; }
-/* At rest a white pill; pressed (--gc-p 1) clear glass that magnifies the track. */
-.gc-range .lqg-glass {
-  background:
-    radial-gradient(circle at 50% 20%, rgb(255 255 255 / calc(var(--gc-p, 0) * 0.5)), transparent 70%),
-    rgb(255 255 255 / calc(1 - var(--gc-p, 0) * 0.94));
-  box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / calc(0.06 + var(--gc-p, 0) * 0.08)), inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 1px 3px rgb(0 0 0 / 0.18), 0 calc(3px + var(--gc-p, 0) * 9px) calc(10px + var(--gc-p, 0) * 18px) rgb(0 0 0 / calc(0.14 + var(--gc-p, 0) * 0.06));
+.gc-range:not([data-glass-pointer]):has(input:focus-visible) .gc-pill { box-shadow: var(--gc-focus); }
+@media (hover: hover) { .gc-range:where(:not(:has(input:disabled))):hover .gc-track { box-shadow: 0 0 0 1px color-mix(in srgb, var(--gc-ink) 28%, transparent); } }
+
+/* ---- Switch -------------------------------------------------------------------------------------------- */
+[data-glass="switch"] {
+  position: relative; display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
+  font: 500 15px/20px system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--gc-ink); cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.gc-range:has(input:focus-visible) .lqg-glass { box-shadow: var(--gc-focus); }
+[data-glass="switch"] input { accent-color: var(--gc-accent); }
+/* The real checkbox covers the whole control, unseen, for pointer, keys and screen readers. */
+[data-glass="switch"].gc input { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+[data-glass="switch"]:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
+[data-glass="switch"]:has(input:disabled) input { cursor: not-allowed; }
+.gc-sw {
+  position: relative; isolation: isolate; display: inline-block; flex: none; width: 55px; height: 24px; border-radius: 12px;
+  background-color: color-mix(in srgb, var(--gc-accent) calc(var(--gc-on, 0) * 100%), var(--gc-track));
+}
+@media (hover: hover) { [data-glass="switch"]:where(:not(:has(input:disabled))):hover .gc-sw { box-shadow: 0 0 0 1px color-mix(in srgb, var(--gc-ink) 28%, transparent); } }
+[data-glass="switch"]:has(input:focus-visible) .gc-sw { box-shadow: var(--gc-focus); }
+
+/* An icon takes the same halo as a label. */
+:where([data-glass="surface"], [data-glass="button"], [data-glass="segmented"]) svg { filter: drop-shadow(0 0 1px var(--gc-halo)) drop-shadow(0 0 2px var(--gc-halo)); }
+
+/* An author display rule would otherwise beat the browser's [hidden]. */
+[data-glass][hidden] { display: none; }
+
+/* Without the engine no label can change colour, so the glass carries more tint and dark labels still read. */
+:root.gc-plain { --gc-tint-amount: 72%; --gc-blur: 12px; }
+.gc-plain [data-glass="button"]:hover { --gc-tint-amount: 80%; }
+@media (scripting: none) { :root { --gc-tint-amount: 72%; --gc-blur: 12px; } }
 
 /* ---- For readers who ask for less ------------------------------------------------------------------- */
 @media (prefers-reduced-transparency: reduce) {
-  :root, html.gc-live { --gc-tint-amount: 94%; --gc-blur: 20px; }
+  :root, :root.gc-plain { --gc-tint-amount: 94%; --gc-blur: 20px; --gc-menu-tint-amount: 94%; --gc-menu-blur: 20px; }
+  :is(:root, .gc-plain) [data-glass="button"]:hover { --gc-tint-amount: 94%; }
 }
 @media (prefers-contrast: more) {
-  :root, html.gc-live { --gc-tint-amount: 100%; --gc-shadow: 0 0 0 1.5px var(--gc-ink); }
+  :root, :root.gc-plain { --gc-tint-amount: 100%; --gc-menu-tint-amount: 100%; --gc-shadow: 0 0 0 1.5px var(--gc-ink); }
+  :is(:root, .gc-plain) [data-glass="button"]:hover { --gc-tint-amount: 100%; }
 }
 @media (forced-colors: active) {
   [data-glass="surface"], [data-glass="button"] { backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid CanvasText; background: Canvas; }
-  .gc-knob .lqg-lens { display: none; }
-  .gc-knob .lqg-glass { border: 2px solid Highlight; background: Canvas; }
+  .gc-knob .gc-canvas { display: none; }
+  .gc-knob .gc-pill { border: 2px solid Highlight; background: Canvas; }
+  .gc-sw { background: Canvas; border: 1px solid CanvasText; }
   .gc-range .gc-track { background: GrayText; }
   .gc-range .gc-track i { background: Highlight; }
 }
+
+/* ---- A label over a dark backdrop (the script sets this): white, with a dark halo ---------------------- */
+html [data-glass-light]:not([aria-pressed="true"]) { --gc-ink: #fff; --gc-halo: rgb(20 20 20 / 0.98); color: var(--gc-ink); }

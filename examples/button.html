@@ -3,18 +3,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="../dist/glass-controls.css">
 <link rel="stylesheet" href="demo.css">
-<script type="importmap">{ "imports": { "liquid-glass-js": "../node_modules/liquid-glass-js/dist/liquid-glass.esm.js" } }</script>
 <script type="module">
   import { init } from '../dist/glass-controls.js'
-  // Demo knobs: ?chroma=0.25 splits colour at live rims; ?refraction=0 turns the live rim off.
-  const q = new URLSearchParams(location.search), root = document.documentElement.style
-  if (q.has('chroma')) root.setProperty('--gc-chroma', q.get('chroma'))
-  if (q.has('refraction')) root.setProperty('--gc-refraction', q.get('refraction'))
   window.glass = init()
 </script>
 </head><body>
-<main class="scene" data-glass-scene><img class="bg" src="photos/neon-signs.jpg" alt="">
-<div class="stage" style="position: absolute; left: 53%; top: 44%">
+<main class="scene"><img class="bg" src="photos/neon-signs.jpg" alt="">
+<div class="stage">
   <button data-glass="button" id="play">Play</button>
   <button data-glass="button" id="follow" aria-pressed="false">Follow</button>
   <button data-glass="button" id="share" aria-label="Share"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5h14v-5"/></svg></button>

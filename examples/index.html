@@ -1,31 +1,32 @@
-<!doctype html><html lang="en"><head><title>glass-controls · glass-controls</title>
+<!doctype html><html lang="en"><head><title>glass-controls</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="../dist/glass-controls.css">
 <link rel="stylesheet" href="demo.css">
-<script type="importmap">{ "imports": { "liquid-glass-js": "../node_modules/liquid-glass-js/dist/liquid-glass.esm.js" } }</script>
 <script type="module">
   import { init } from '../dist/glass-controls.js'
-  // Demo knobs: ?chroma=0.25 splits colour at live rims; ?refraction=0 turns the live rim off.
-  const q = new URLSearchParams(location.search), root = document.documentElement.style
-  if (q.has('chroma')) root.setProperty('--gc-chroma', q.get('chroma'))
-  if (q.has('refraction')) root.setProperty('--gc-refraction', q.get('refraction'))
   window.glass = init()
 </script>
 </head><body>
-<main class="scene" data-glass-scene><img class="bg" src="photos/glass-building.jpg" alt="">
+<main class="scene"><img class="bg" src="photos/glass-building.jpg" alt="">
 <style>
-  .stack { display: grid; gap: 18px; justify-items: center; }
+  .stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; justify-items: center; }
+  /* A long row on a phone scrolls sideways and shows its next item cut, so you can tell there is more. */
+  @media (max-width: 595px) {
+    .stack .capsule { box-sizing: border-box; width: min(281px, 100%); scroll-padding-inline: 12px; overflow: auto hidden; scrollbar-width: none; overscroll-behavior-x: contain; }
+    .stack .pane { width: min(281px, 100%); }
+    .stack [data-glass="segmented"] { width: max-content; touch-action: pan-x pinch-zoom; }
+  }
   .links { --gc-radius: 24px; padding: 14px 18px; }
   .links a { color: inherit; margin: 0 8px; }
 </style>
 <div class="stage stack">
   <nav data-glass="surface" class="capsule" aria-label="Examples">
     <ul data-glass="segmented">
-      <li><a href="#" aria-current="page">All</a></li><li><a href="button.html">Button</a></li><li><a href="segmented.html">Segmented</a></li><li><a href="slider.html">Slider</a></li><li><a href="nav.html">Nav</a></li><li><a href="surface.html">Surface</a></li>
+      <li><a href="#" aria-current="page">All</a></li><li><a href="button.html">Button</a></li><li><a href="segmented.html">Segmented</a></li><li><a href="slider.html">Slider</a></li><li><a href="switch.html">Switch</a></li><li><a href="nav.html">Nav</a></li><li><a href="surface.html">Surface</a></li>
     </ul>
   </nav>
   <div data-glass="surface" class="pane"><label for="v">Volume</label><div data-glass="slider"><input id="v" type="range" value="60"></div></div>
   <button data-glass="button">Continue</button>
 </div>
-<p class="credit">Photo: <a href="https://unsplash.com/photos/-Ksr263JEa8">Ricardo Gomez Angel</a> on Unsplash</p><a class="back" href="./">All examples</a></main></body></html>
+<p class="credit">Photo: <a href="https://unsplash.com/photos/-Ksr263JEa8">Ricardo Gomez Angel</a> on Unsplash</p></main></body></html>

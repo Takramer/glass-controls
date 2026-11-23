@@ -6,12 +6,12 @@
 
 The glass material on any element: tint (`--gc-tint`, `--gc-tint-amount`), frost (`--gc-blur`, `--gc-saturate`), rim light (`--gc-rim`) and shadow (`--gc-shadow`). It works without the script.
 
-With the script, in Chromium, the rim refracts the live page under it. Three unitless properties tune it, read when the surface is wired and when it resizes:
+A surface that holds rows of text is a menu. Add `data-glass-menu` and it takes Apple's frosted material (`--gc-menu-tint-amount`, `--gc-menu-blur`). Controls stay nearly clear.
 
-- `--gc-bezel` (default 14): how far in from the edge the rim curves, in px.
-- `--gc-refraction` (default 22): the most a ray moves sideways, in px. Capped at twice the bezel.
-- `--gc-chroma` (default 0): colour split at the rim, 0 to 0.5. Three filter passes instead of one.
+With the script, the WebGL2 engine paints the page under the surface and bends it at the rim, in the shape of the element's `border-radius`. Without WebGL2 the surface keeps its CSS material.
 
-The refraction keeps its shape to the element's `border-radius`. A surface larger than 1.2 megapixels keeps the material only.
+Each label inside (`a`, `button`, `label`, `p`, a heading, or anything marked `data-glass-label`) reads what shows through the glass behind it. Over a dark backdrop it turns white with a dark halo.
 
-Example: [examples/surface.html](../examples/surface.html). Add `?chroma=0.3` to see the colour split.
+The page picture leaves out shadows, conic gradients, masks, rotation, `::before`, `::after` and images from another origin without CORS. Over such an element, add `data-glass-backdrop="css"` to it and the glass uses the CSS material. Add `data-glass-skip` to leave an element out of the picture.
+
+Example: [examples/surface.html](../examples/surface.html).

@@ -10,7 +10,7 @@ A nav capsule is a surface holding a segmented list of links:
   </ul>
   <button aria-expanded="false" aria-controls="more">More</button>
 </nav>
-<div data-glass="surface" id="more" hidden style="--gc-radius: 24px; padding: 6px">
+<div data-glass="surface" data-glass-menu id="more" hidden style="--gc-radius: 24px; padding: 6px">
   <ul data-glass="segmented" aria-orientation="vertical">
     <li><a href="/journal">Journal</a></li>
   </ul>
@@ -19,6 +19,7 @@ A nav capsule is a surface holding a segmented list of links:
 
 - The current page is marked by your page with `aria-current`; the pill rests there.
 - The menu sheet is a **sibling** of the capsule, not a child: glass inside glass loses its backdrop.
+- `data-glass-menu` makes the sheet frosted (66% tint over 16 px of blur), as Apple's menus are.
 - Opening and closing the sheet is your code (the example toggles `hidden` and `aria-expanded` and closes on Escape). The vertical list gives it a pill that follows a finger down the rows and opens the row it lands on.
 - Links dragged with a mouse do not start the browser's own link drag; the lens drags instead.
 

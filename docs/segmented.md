@@ -18,7 +18,7 @@ The segmented element holds the items and draws no material of its own; the surf
 - **Dragging:** press the chosen item and drag; the lens follows the finger between the outer items and, on release, lands on the nearest and chooses it (by clicking it, so your handlers run).
 - **Vertical:** add `aria-orientation="vertical"` for a column (a menu). With nothing chosen the pill shows only under the finger.
 
-The lens shows the nearest `[data-glass-scene]` ancestor, cloned when pressed, else the control itself.
+The lens bends the page under it, read when a finger lands, and the labels it passes. Inside a `data-glass-menu` surface that page is frosted to match.
 
 Keyboard: Tab to an item, Enter or Space to choose it; the lens follows. Arrow-key roving focus is not built in; add it if your group needs radio semantics.
 
