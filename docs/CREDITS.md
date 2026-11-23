@@ -15,5 +15,6 @@ All six are from Unsplash, used under the [Unsplash License](https://unsplash.co
 
 ## Code
 
-- **liquid-glass-js** 0.1.0, MIT License, Copyright (c) 2026 Eamon Liu. https://github.com/eamonliu/liquid-glass-js. Used as a dependency for every lens; not copied into this repository.
-- **The live refraction method** is kube.io's, from "Liquid Glass in the Browser" (https://kube.io/blog/liquid-glass-css-svg/). `src/refract.js` re-implements the published description; no code from the article is copied (the article publishes none under a licence).
+- **liquid-glass**, MIT License, Copyright (c) 2026 Bilal Abdullah Gürşen. https://github.com/bilalgursen/liquid-glass. `src/engine.ts` and `src/dom-snapshot.ts` are copied from it, each with its notice, and the licence is in `src/LICENSE.liquid-glass`. The one change to the engine's code: `surfaceColorOf` walks every ancestor up to `<html>` and falls back to white. `src/surface.ts` and `src/lens.ts` are written after its design.
+
+Version 0.1.0 used liquid-glass-js by Eamon Liu (MIT) for its lenses and kube.io's published refraction method for its rims. Version 0.2.0 uses neither.

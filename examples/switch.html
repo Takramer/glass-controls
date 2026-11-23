@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><title>Switch · glass-controls</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../dist/glass-controls.css">
+<link rel="stylesheet" href="demo.css">
+<script type="module">
+  import { init } from '../dist/glass-controls.js'
+  window.glass = init()
+</script>
+</head><body>
+<main class="scene"><img class="bg" src="photos/vertical-lines.jpg" alt="">
+<div class="stage">
+  <div data-glass="surface" data-glass-menu class="pane settings">
+    <label data-glass="switch"><input type="checkbox" checked> Wi-Fi</label>
+    <label data-glass="switch"><input type="checkbox"> Bluetooth</label>
+    <label data-glass="switch"><input type="checkbox" disabled> AirDrop</label>
+  </div>
+</div>
+<p class="credit">Photo: <a href="https://unsplash.com/photos/ensfVEUbiJc">Alexander Psiuk</a> on Unsplash</p><a class="back" href="./">All examples</a></main></body></html>

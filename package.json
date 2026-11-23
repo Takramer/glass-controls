@@ -1,7 +1,7 @@
 {
   "name": "glass-controls",
-  "version": "0.1.0",
-  "description": "A framework-free control layer of glass: live backdrop refraction for surfaces, magnifying lenses for sliders and segmented controls, and spring touch physics. Lenses by liquid-glass-js.",
+  "version": "0.2.0",
+  "description": "A framework-free control layer of liquid glass: one WebGL2 engine for surfaces and lenses, frosted menus, sliders, segmented controls, switches and spring touch physics.",
   "type": "module",
   "main": "dist/glass-controls.js",
   "module": "dist/glass-controls.js",
@@ -9,7 +9,8 @@
   "exports": {
     ".": {
       "types": "./dist/glass-controls.d.ts",
-      "import": "./dist/glass-controls.js"
+      "import": "./dist/glass-controls.js",
+      "default": "./dist/glass-controls.js"
     },
     "./glass-controls.css": "./dist/glass-controls.css"
   },
@@ -23,25 +24,24 @@
     "*.css"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --bundle --format=esm --external:liquid-glass-js --outfile=dist/glass-controls.js && esbuild src/index.js --bundle --minify --format=esm --external:liquid-glass-js --outfile=dist/glass-controls.min.js && cp src/glass-controls.css src/glass-controls.d.ts dist/",
-    "check": "node src/refract.js",
+    "build": "esbuild src/index.js --bundle --format=esm --outfile=dist/glass-controls.js && esbuild src/index.js --bundle --minify --format=esm --outfile=dist/glass-controls.min.js && cp src/glass-controls.css src/glass-controls.d.ts dist/",
+    "check": "npm run build && node scripts/check.mjs",
     "serve": "python3 -m http.server 8811"
-  },
-  "dependencies": {
-    "liquid-glass-js": "0.1.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"
   },
   "keywords": [
     "glass",
+    "liquid-glass",
     "refraction",
+    "webgl2",
     "backdrop-filter",
-    "svg-filter",
     "spring",
     "ui-controls",
     "slider",
-    "segmented-control"
+    "segmented-control",
+    "switch"
   ],
   "license": "MIT",
   "author": "Thomas Kramer",
