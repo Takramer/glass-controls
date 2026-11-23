@@ -6,6 +6,8 @@
 
 The glass material on any element: tint (`--gc-tint`, `--gc-tint-amount`), frost (`--gc-blur`, `--gc-saturate`), rim light (`--gc-rim`) and shadow (`--gc-shadow`). It works without the script.
 
+A surface that holds rows of text is a menu. Add `data-glass-menu` and it takes Apple's frosted material (`--gc-menu-tint-amount`, `--gc-menu-blur`). Controls stay nearly clear.
+
 With the script, in Chromium, the rim refracts the live page under it. Three unitless properties tune it, read when the surface is wired and when it resizes:
 
 - `--gc-bezel` (default 14): how far in from the edge the rim curves, in px.

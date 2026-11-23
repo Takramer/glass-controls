@@ -18,7 +18,7 @@
   .bar { position: absolute; top: 20px; left: 50%; translate: -50%; display: flex; align-items: center; gap: 4px; padding: 4px; }
   .bar .more { min-height: 36px; padding: 0 14px 0 16px; border: 0; border-radius: 999px; background: none; font: 500 15px/20px system-ui; color: inherit; cursor: pointer; }
   .bar .more:focus-visible { outline: none; box-shadow: var(--gc-focus); }
-  .sheet { --gc-radius: 24px; --gc-tint-amount: 62%; position: absolute; top: 72px; left: 50%; translate: 60px 0; width: 200px; padding: 6px; transform-origin: 70% 0; transition: opacity 160ms, scale 240ms cubic-bezier(.32,.72,0,1); }
+  .sheet { --gc-radius: 24px; position: absolute; top: 72px; left: 50%; translate: 60px 0; width: 200px; padding: 6px; transform-origin: 70% 0; transition: opacity 160ms, scale 240ms cubic-bezier(.32,.72,0,1); }
   .sheet[hidden] { display: block; opacity: 0; scale: .9; pointer-events: none; visibility: hidden; }
 </style>
 <nav data-glass="surface" class="bar" aria-label="Main" id="bar">
@@ -27,7 +27,7 @@
   </ul>
   <button class="more" aria-expanded="false" aria-controls="sheet" id="more">More</button>
 </nav>
-<div data-glass="surface" class="sheet" id="sheet" hidden>
+<div data-glass="surface" data-glass-menu class="sheet" id="sheet" hidden>
   <ul data-glass="segmented" aria-orientation="vertical">
     <li><a href="#journal">Journal</a></li><li><a href="#talks">Talks</a></li><li><a href="#contact">Contact</a></li>
   </ul>

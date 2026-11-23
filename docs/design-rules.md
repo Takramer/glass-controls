@@ -10,3 +10,4 @@ Glass is easy to overuse. These rules keep it doing one job: lifting controls of
 6. **Group what belongs together.** Controls that act on the same thing share one piece of glass (a segmented row in one capsule) rather than each floating alone.
 7. **Over nothing, no glass.** On a plain page there is nothing to bend. Use a quiet fill there and keep glass for where content passes behind.
 8. **Motion is feedback, not decoration.** The springs answer a finger. Nothing moves on its own, and under reduced motion nothing overshoots.
+9. **Controls nearly clear, menus frosted.** Apple's clearest glass is still not fully see-through, and its menus are frosted because they hold rows of text. Keep some tint on every control and put `data-glass-menu` on every menu.

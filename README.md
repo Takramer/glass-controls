@@ -54,6 +54,17 @@ With a bundler, `import 'glass-controls/glass-controls.css'`. Without one, map t
 
 Read [docs/design-rules.md](docs/design-rules.md) before putting glass on a page.
 
+## Two materials
+
+The kit follows Apple's Liquid Glass. Neither material is fully see-through.
+
+- **Controls** (a capsule, a button, a segmented row) are nearly clear: 32% tint over 1 px of blur.
+- **Menus** hold rows of text, so they are frosted: 66% tint over 16 px of blur. Add `data-glass-menu` to the surface.
+
+```html
+<div data-glass="surface" data-glass-menu>…</div>
+```
+
 ## The two optics
 
 Glass on the web can be made two ways, and each fails where the other works.
@@ -132,7 +143,7 @@ Old Playwright headless (`chromium-headless-shell`) does not render `backdrop-fi
 
 - **Native controls stay native.** The slider is a real `<input type="range">` kept in the page, unseen, for keys and screen readers. Segmented items are real buttons (`aria-pressed`) or links (`aria-current`).
 - **Focus rings on glass.** `--gc-focus` is a two-tone ring (white inside, near-black outside) so it reads over any photo. The slider's thumb takes the ring when its range has focus.
-- **Contrast over busy backgrounds.** Text on glass needs its tint. The default keeps 52% white (42% where the rim refracts); test your own scenes against WCAG 4.5:1 for body text, and raise `--gc-tint-amount` where a photo is busy behind text. See the [design rules](docs/design-rules.md).
+- **Contrast over busy backgrounds.** A control keeps 32% white, and a halo (`--gc-halo`) hugs its label's letters. Test your own scenes against WCAG 4.5:1 for body text. Raise `--gc-tint-amount` where a photo is busy behind text, and on a dark scene set a white `--gc-ink` with a dark `--gc-halo`. See the [design rules](docs/design-rules.md).
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` every spring snaps to its target; nothing overshoots or stretches.
 - **Reduced transparency and more contrast.** `prefers-reduced-transparency` raises the tint to 94%; `prefers-contrast: more` makes the glass opaque with a solid outline.
 - **Forced colours.** Under `forced-colors: active` glass becomes `Canvas` with a `CanvasText` border, lenses hide, and the selection is a `Highlight` outline.
@@ -150,8 +161,10 @@ Every look is a custom property on `:root` or any element:
 
 | Property | Default | |
 |---|---|---|
-| `--gc-tint` / `--gc-tint-amount` | `#fff` / `52%` | Glass colour and how much of it |
-| `--gc-blur` / `--gc-saturate` | `14px` / `1.8` | Frost |
+| `--gc-tint` / `--gc-tint-amount` | `#fff` / `32%` | Glass colour and how much of it |
+| `--gc-blur` / `--gc-saturate` | `1px` / `1.8` | Frost |
+| `--gc-menu-tint-amount` / `--gc-menu-blur` | `66%` / `16px` | The frost on a `data-glass-menu` surface |
+| `--gc-halo` | white | Hugs a label's letters; `transparent` on a menu |
 | `--gc-ink` | `#111` | Text on glass |
 | `--gc-radius` | `999px` | Capsule by default |
 | `--gc-rim` / `--gc-shadow` | inset highlights / soft drop | Rim light and shadow |

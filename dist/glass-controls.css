@@ -1,12 +1,15 @@
 /* glass-controls: the material, rim light, shadow and control styles.
-   Works without the script: every [data-glass] element keeps the frosted material and native behaviour.
+   Works without the script: every [data-glass] element keeps the glass material and native behaviour.
    The script adds .gc once a control is wired, the refracting rim where the browser can run one
    (html.gc-live, Chromium), the springs, and the lenses. Tune everything with the custom properties. */
 
 :root {
   --gc-tint: #fff;           /* the glass colour */
-  --gc-tint-amount: 52%;     /* how much of it; the rest is the blurred backdrop */
-  --gc-blur: 14px;
+  --gc-tint-amount: 32%;     /* how much of it: a control is nearly clear, as Apple's are */
+  --gc-blur: 1px;
+  --gc-menu-tint-amount: 66%; /* a menu holds rows of text, so it is frosted */
+  --gc-menu-blur: 16px;
+  --gc-halo: rgb(255 255 255 / 0.98); /* hugs a label's letters; on a dark scene use a dark one and a white --gc-ink */
   --gc-saturate: 1.8;
   --gc-ink: #111;            /* text on glass */
   --gc-accent: #0a64d8;      /* a selected button */
@@ -25,8 +28,6 @@
   /* Two tones, so the ring reads over any photo. */
   --gc-focus: 0 0 0 2px #fff, 0 0 0 4.5px #111;
 }
-/* With a refracting rim the glass can be clearer: the rim, not the blur, says what it is. */
-html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
 
 /* ---- The material ------------------------------------------------------------------------------------ */
 [data-glass="surface"], [data-glass="button"] {
@@ -38,6 +39,11 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
   backdrop-filter: blur(var(--gc-blur)) var(--gc-lens,) saturate(var(--gc-saturate));
   box-shadow: var(--gc-rim), var(--gc-shadow);
 }
+/* Apple's second material: on a surface that holds rows, add data-glass-menu. */
+[data-glass="surface"][data-glass-menu] { --gc-tint-amount: var(--gc-menu-tint-amount); --gc-blur: var(--gc-menu-blur); --gc-halo: transparent; }
+:is([data-glass="surface"], [data-glass="button"], [data-glass="segmented"]) {
+  text-shadow: 0 0 1px var(--gc-halo), 0 0 1px var(--gc-halo), 0 0 2px var(--gc-halo), 0 0 3px var(--gc-halo), 0 0 8px var(--gc-halo);
+}
 
 /* ---- Buttons ----------------------------------------------------------------------------------------- */
 [data-glass="button"] {
@@ -48,14 +54,14 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
   cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent;
   transition: background-color 160ms ease, color 160ms ease;
 }
-@media (hover: hover) { [data-glass="button"]:hover { --gc-tint-amount: 72%; } }
+@media (hover: hover) { [data-glass="button"]:hover { --gc-tint-amount: 48%; } }
 [data-glass="button"][aria-pressed="true"] {
-  --gc-tint: var(--gc-accent); --gc-tint-amount: 88%; color: var(--gc-accent-ink);
+  --gc-tint: var(--gc-accent); --gc-tint-amount: 88%; color: var(--gc-accent-ink); text-shadow: none;
 }
 [data-glass="button"]:focus-visible { outline: none; box-shadow: var(--gc-rim), var(--gc-shadow), var(--gc-focus); }
 /* The light under the finger, brightest at the peak of the press (--gc-p runs 0 to 1). */
 [data-glass="button"].gc::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; /* under the label */
   background: radial-gradient(circle at var(--gc-lx, 50%) var(--gc-ly, 30%), rgb(255 255 255 / calc(var(--gc-p, 0) * 0.6)), transparent 70%);
 }
 [data-glass="button"]:not(.gc):active { scale: 0.97; }
@@ -117,10 +123,10 @@ html.gc-live { --gc-tint-amount: 42%; --gc-blur: 8px; }
 
 /* ---- For readers who ask for less ------------------------------------------------------------------- */
 @media (prefers-reduced-transparency: reduce) {
-  :root, html.gc-live { --gc-tint-amount: 94%; --gc-blur: 20px; }
+  :root { --gc-tint-amount: 94%; --gc-blur: 20px; --gc-menu-tint-amount: 94%; --gc-menu-blur: 20px; }
 }
 @media (prefers-contrast: more) {
-  :root, html.gc-live { --gc-tint-amount: 100%; --gc-shadow: 0 0 0 1.5px var(--gc-ink); }
+  :root { --gc-tint-amount: 100%; --gc-menu-tint-amount: 100%; --gc-shadow: 0 0 0 1.5px var(--gc-ink); }
 }
 @media (forced-colors: active) {
   [data-glass="surface"], [data-glass="button"] { backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid CanvasText; background: Canvas; }
